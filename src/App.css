@@ -1,11 +1,13 @@
-.logo{
-    width: 150px;
-    max-height: 400px!important;
-    margin-left: 10vh;
+body {
+    background-color: rgb(40, 40, 40);
 }
-.margen{
-    margin-right:10vh;
+
+body::-webkit-scrollbar{
+    width: 12px;
 }
-.navbar-item{
-    color: aqua;
+
+body::-webkit-scrollbar-thumb{
+    background-color: #b7b7a4;
+    border-radius: 10px;
+    border-right: 2px solid rgb(40, 40, 40);
 }

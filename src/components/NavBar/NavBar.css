@@ -1,0 +1,22 @@
+.li-link {
+    list-style: none;
+}
+.category-link-nb {
+    text-decoration: none;
+    color: #a8dadc;
+}
+
+.category-link-nb:hover{
+    color: #E0E1DD;
+}
+
+.nav-bar {
+    background-color: #415A77;
+}
+
+.brand-name{
+    color: #E0E1DD;
+    font-size:40px;
+    font-weight: 700;
+    text-decoration: none;
+}
