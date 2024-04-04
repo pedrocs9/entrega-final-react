@@ -1,42 +1,49 @@
-import { getProducts, getProductsByCategory } from "../../asyncMock";
-import { Link, useParams } from "react-router-dom";
+import { db } from "../../config/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import "./ItemListContainer.css"
-function ItemListContainer() {
+import "./ItemListContainer.css";
+import ItemList from "./ItemList/ItemList";
 
-    const {category} = useParams(); 
-    const [products, setProducts] = useState([]);
+export default function ItemListContainer() {
+  const { category } = useParams();
+  const [products, setProducts] = useState([]);
 
-    useEffect(() => {
-        const asyncFunc = category ? getProductsByCategory : getProducts
+  const itemsCollection = collection(db, "Items");
 
-        asyncFunc(category)
-            .then(res => setProducts(res))
-            .catch(error => console.error(error));
-    }, [category]);
+  const getProducts = async () => {
+    const data = await getDocs(itemsCollection);
+    const filteredData = data.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
 
-    
+    setProducts(filteredData);
+  };
 
-    return (
-        <main>
-            <h1 className="title-ilc">¡Equipate como todo un PRO!</h1>
-            <div className="container container-products-ilc">
-                {products.map((prod) => {
-                    const formattedPrice = (prod.price).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
-                    return (
-                        <article key={prod.id}  className="product-card-ilc">
-                            <div className="container-img-ilc">
-                                <img src={prod.image} alt={prod.description} className="img-ilc"/>
-                            </div>
-                            <h4 className="product-name-ilc">{prod.name}</h4>
-                            <h5 className="product-name-ilc">{formattedPrice}</h5>
-                            <Link to={`/item/${prod.id}`} className="info-product-ilc">Ver producto</Link>
-                        </article>
-                    );
-                })}
-            </div>
-        </main>
+  const getProductsByCategory = async () => {
+    const upperCategory = category.charAt(0).toUpperCase() + category.slice(1);
+    const data = await getDocs(itemsCollection);
+    const filteredData = data.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    const newFilteredData = filteredData.filter(
+      (prod) => prod.category === upperCategory
     );
-}
 
-export default ItemListContainer;
+    setProducts(newFilteredData);
+  };
+
+  useEffect(() => {
+    const asyncFunc = category ? getProductsByCategory : getProducts;
+    asyncFunc(category);
+  }, [category]);
+
+  return (
+    <main>
+      <h1 className="title-ilc">¡Equipate como todo un PRO!</h1>
+      <ItemList products={products} />
+    </main>
+  );
+}

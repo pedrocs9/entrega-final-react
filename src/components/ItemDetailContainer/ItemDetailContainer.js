@@ -1,35 +1,37 @@
 import { useParams } from "react-router-dom";
-import productList from "../../asyncMock";
-import ItemCount from "../ItemCount/ItemCount";
+import { db } from "../../config/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import ItemDetail from "./ItemDetail/ItemDetail";
 import "./ItemDetailContainer.css";
 
-function ItemDetailContainer() {
+export default function ItemDetailContainer() {
 
-    const {id} = useParams();
-    const item = productList.find((prod) => prod.id === id);
-    const {name, category, price, alt, description, image} = item;
-    const formattedPrice = (price).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+    const [products, setProducts] = useState([]);
+
+    const itemsCollection = collection(db, "Items")
+    const getProducts = async () => {
+        const data = await getDocs(itemsCollection);
+        const filteredData = data.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+        }));
+        const item = filteredData.find((prod) => prod.id === id);
+
+        setProducts(item);
+    };
+    
+    const { id } = useParams();
+
+    useEffect(() => {
+        getProducts();
+    }, []);
 
     return (
         <main className="main-idc">
             <div className="container">
-                <article >
-                    <h1 className="title-idc">{name}</h1>
-                    <h4 className="subtitle-idc">Categoría: {category}</h4>
-                    <div className="container-info-idc">
-                        <div className="container-image">
-                            <img src={image} alt={alt} className="img-idc"/>
-                        </div>
-                        <div className="desc-container-idc">
-                            <p className="description-idc">{description}</p>
-                            <p className="description-idc">{formattedPrice}</p>
-                            <ItemCount price={price} className="count-idc"/>
-                        </div>
-                    </div> 
-                </article>
+                <ItemDetail products={products}/>
             </div>
         </main>
     );
 };
-
-export default ItemDetailContainer;

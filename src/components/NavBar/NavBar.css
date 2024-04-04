@@ -20,3 +20,7 @@
     font-weight: 700;
     text-decoration: none;
 }
+
+.top-nav{
+    display: flex;
+}
